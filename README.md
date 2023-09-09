@@ -13,6 +13,7 @@ Sets up a new Mojo development environment for Linux (currently only works on x8
   * [Further Reading](#further-reading)
 
 ## Setup
+* Sign up for a free developer account at [Modular](https://developer.modular.com/signup)
 * Install
   * make
     * [Debian/Ubuntu](https://www.gnu.org/software/make/)
