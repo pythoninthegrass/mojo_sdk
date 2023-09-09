@@ -2,9 +2,11 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/python
 {
   "name": "Dev Environment",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
+  // "build": {
+  //   "dockerfile": "../Dockerfile"
+  // },
+  "dockerComposeFile": "../docker-compose.yml",
+  "shutdownAction": "stopCompose",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -12,9 +14,11 @@
         "codezombiech.gitignore",
         "eamodio.gitlens",
         "EditorConfig.EditorConfig",
+        "GitHub.codespaces",
         "GitHub.copilot-chat",
         "GitHub.copilot",
         "mads-hartmann.bash-ide-vscode",
+        "modular-mojotools.vscode-mojo",
         "ms-azuretools.vscode-docker",
         "ms-python.python",
         "ms-vscode.atom-keybindings",

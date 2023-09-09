@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.6
 
 # full semver just for python base image
-ARG PYTHON_VERSION=3.11.4
+ARG PYTHON_VERSION=3.11.5
 
 FROM python:${PYTHON_VERSION}-slim-bullseye AS builder
 
@@ -11,10 +11,13 @@ ARG DEBIAN_FRONTEND=noninteractive
 # update apt repos and install dependencies
 RUN apt -qq update && apt -qq install \
     --no-install-recommends -y \
+    apt-transport-https \
     curl \
     gcc \
+    gnupg \
     libpq-dev \
     python3-dev \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 # pip env vars
@@ -32,12 +35,18 @@ ENV POETRY_NO_INTERACTION=1
 ENV VENV="/opt/venv"
 ENV PATH="$POETRY_HOME/bin:$VENV/bin:$PATH"
 
-COPY requirements.txt requirements.txt
+COPY ../requirements.txt requirements.txt
 
 RUN python -m venv $VENV \
     && . "${VENV}/bin/activate"\
     && python -m pip install "poetry==${POETRY_VERSION}" \
     && python -m pip install -r requirements.txt
+
+# setup mojo sdk
+COPY mojo.sh /app/mojo.sh
+ARG MODULAR_AUTH
+RUN chmod +x /app/mojo.sh \
+	&& bash -vx /app/mojo.sh
 
 FROM python:${PYTHON_VERSION}-slim-bullseye AS runner
 
@@ -66,16 +75,10 @@ ARG DEBIAN_FRONTEND=noninteractive
 # install dependencies
 RUN apt -qq update && apt -qq install \
     --no-install-recommends -y \
-    bat \
-    curl \
     dpkg \
     git \
-    iputils-ping \
-    lsof \
     p7zip \
     perl \
-    shellcheck \
-    tldr \
     tree \
     && rm -rf /var/lib/apt/lists/*
 
@@ -88,6 +91,9 @@ RUN <<EOF
 mkdir -p /app/{certs,staticfiles}
 chown -R "${USER_NAME}:${USER_GROUP}" /app/
 EOF
+
+# copy mojo bin
+COPY --from=builder /usr/bin/modular /usr/bin/modular
 
 USER $USER_NAME
 WORKDIR $HOME

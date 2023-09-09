@@ -5,9 +5,10 @@
 .ONESHELL:
 
 # ENV VARS
-export SHELL 	:= $(shell which sh)
-export PY_VER	:= "3.11.5"
-export UNAME 	:= $(shell uname -s)
+export SHELL 		:= $(shell which sh)
+export PY_VER		:= "3.11.5"
+export UNAME 		:= $(shell uname -s)
+export REPO 		:= $(shell basename $(shell git rev-parse --show-toplevel))
 
 # MULTIPASS
 export NAME			:= testvm
@@ -124,6 +125,10 @@ pip: python ## install pip
 	else \
 		echo "pip install not supported on os"; \
 	fi
+
+build: ## build docker image
+	@echo "${YELLOW}Building docker image${RESET}"
+	docker-compose build --pull --no-cache
 
 ## * MULTIPASS START
 launch: ## launch a new instance of ubuntu
